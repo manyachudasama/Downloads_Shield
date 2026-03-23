@@ -1,40 +1,45 @@
-import { dangerousExtensions, suspiciousKeywords } from "./rulesEngine.js";
+export function extractFileName(item) {
+  if (item.filename && item.filename.includes(".")) {
+    return item.filename;
+  }
 
-// 1. Check for dangerous extensions (.exe, .bat, etc.)
-export function isDangerousExtension(filename = "", url = "") {
-  const name = filename.toLowerCase();
-  const link = url.toLowerCase();
-
-  return dangerousExtensions.some(ext =>
-    name.endsWith(ext) || link.endsWith(ext)
-  );
+  try {
+    const url = new URL(item.url);
+    const pathname = url.pathname.split("/").pop();
+    return pathname || "";
+  } catch {
+    return "";
+  }
 }
 
-// 2. Detect disguised files (e.g., file.pdf.exe)
-export function hasDoubleExtension(filename = "") {
-  const parts = filename.toLowerCase().split(".");
+export function getExtension(filename) {
+  if (!filename) return "";
 
+  const clean = filename.split("?")[0].toLowerCase();
+  const parts = clean.split(".");
+
+  if (parts.length < 2) return "";
+
+  return parts.pop();
+}
+
+export function hasDoubleExtension(filename) {
+  if (!filename) return false;
+
+  const parts = filename.toLowerCase().split(".");
   if (parts.length < 3) return false;
 
-  const lastExt = "." + parts.pop();
+  const dangerous = [
+    "exe","scr","bat","cmd","com","pif","js","jar","vbs","msi","sh"
+  ];
 
-  return dangerousExtensions.includes(lastExt);
+  return dangerous.includes(parts[parts.length - 1]);
 }
 
-// 3. Detect suspicious keywords (crack, keygen, etc.)
-export function hasSuspiciousKeywords(filename = "") {
-  const name = filename.toLowerCase();
+export function isDangerousExtension(ext) {
+  const blocked = [
+    "exe","scr","bat","cmd","com","pif","js","jar","vbs","msi","sh"
+  ];
 
-  return suspiciousKeywords.some(keyword =>
-    name.includes(keyword)
-  );
-}
-
-// 4. Detect hidden or suspicious filenames
-export function isSuspiciousName(filename = "") {
-  return (
-    !filename.includes(".") ||   // no extension
-    filename.includes("..") ||  // weird pattern
-    filename.length < 4         // too short
-  );
+  return blocked.includes(ext);
 }
