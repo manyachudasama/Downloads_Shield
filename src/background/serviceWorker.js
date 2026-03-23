@@ -1,15 +1,20 @@
 import { analyzeDownload } from "../core/analyzer.js";
 import { getSettings, saveLog } from "../storage/storageManager.js";
 
-// Listen for new downloads
+const allowedDownloads = new Set();
+
 chrome.downloads.onCreated.addListener(async (item) => {
   const settings = await getSettings();
 
   if (!settings.enabled) return;
 
-  // FIX: Ensure filename exists
   const filename = item.filename || item.url.split("/").pop();
   item.filename = filename;
+
+  if (allowedDownloads.has(item.url)) {
+    allowedDownloads.delete(item.url);
+    return;
+  }
 
   const result = await analyzeDownload(item);
 
@@ -35,3 +40,9 @@ function openWarningPage(item, reason) {
 
   chrome.tabs.create({ url });
 }
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "ALLOW_DOWNLOAD") {
+    allowedDownloads.add(message.url);
+  }
+});

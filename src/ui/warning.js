@@ -13,6 +13,11 @@ document.getElementById("proceedBtn").addEventListener("click", () => {
   );
 
   if (confirmAgain) {
+    chrome.runtime.sendMessage({
+      type: "ALLOW_DOWNLOAD",
+      url: downloadUrl
+    });
+
     chrome.downloads.download({
       url: downloadUrl
     });
