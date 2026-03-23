@@ -19,7 +19,8 @@ document.getElementById("proceedBtn").addEventListener("click", () => {
     });
 
     chrome.downloads.download({
-      url: downloadUrl
+      url: downloadUrl,
+      filename: fileName
     });
 
     window.close();

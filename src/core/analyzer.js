@@ -10,6 +10,10 @@ import {
   isExecutableMime
 } from "./mimeChecker.js";
 
+import {
+  hasSuspiciousKeyword
+} from "./rulesEngine.js";
+
 export async function analyzeDownload(item) {
   const filename = extractFileName(item);
   const ext = getExtension(filename);
@@ -33,6 +37,13 @@ export async function analyzeDownload(item) {
     return {
       isDangerous: true,
       reason: "Executable file without extension"
+    };
+  }
+
+  if (hasSuspiciousKeyword(filename) || hasSuspiciousKeyword(item.url)) {
+    return {
+      isDangerous: true,
+      reason: "Suspicious keyword detected"
     };
   }
 

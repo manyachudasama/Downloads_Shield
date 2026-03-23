@@ -22,7 +22,5 @@
   "action": {
   "default_popup": "src/ui/popup.html",
   "default_title": "SafeShield"
-   },
-
-  "icons": {}
+   }
 }

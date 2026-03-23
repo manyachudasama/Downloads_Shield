@@ -1,5 +1,6 @@
 import { analyzeDownload } from "../core/analyzer.js";
 import { getSettings, saveLog } from "../storage/storageManager.js";
+import { scanZip } from "../core/zipScanner.js";
 
 const allowedDownloads = new Set();
 
@@ -31,6 +32,30 @@ chrome.downloads.onCreated.addListener(async (item) => {
 
     openWarningPage(item, result.reason);
   }
+});
+
+chrome.downloads.onChanged.addListener(async (delta) => {
+  if (!delta.state || delta.state.current !== "complete") return;
+
+  chrome.downloads.search({ id: delta.id }, async (results) => {
+    const item = results[0];
+    if (!item) return;
+
+    if (!item.filename.endsWith(".zip")) return;
+
+    try {
+      const response = await fetch(item.url);
+      const blob = await response.blob();
+
+      const result = await scanZip(blob);
+
+      if (result.isDangerous) {
+        chrome.downloads.removeFile(item.id);
+
+        openWarningPage(item, result.reason);
+      }
+    } catch {}
+  });
 });
 
 function openWarningPage(item, reason) {

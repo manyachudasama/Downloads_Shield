@@ -1,6 +1,6 @@
 export const dangerousExtensions = [
-  ".exe", ".scr", ".vbs", ".bat", ".com", ".pif",
-  ".js", ".msi", ".cmd", ".sh", ".jar", ".html"
+  "exe","scr","vbs","bat","com","pif",
+  "js","msi","cmd","sh","jar","html"
 ];
 
 export const suspiciousKeywords = [
@@ -11,3 +11,13 @@ export const suspiciousKeywords = [
   "free-download",
   "activated"
 ];
+
+export function hasSuspiciousKeyword(text) {
+  if (!text) return false;
+
+  const lower = text.toLowerCase();
+
+  return suspiciousKeywords.some(keyword =>
+    lower.includes(keyword)
+  );
+}
