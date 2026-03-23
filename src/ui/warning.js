@@ -9,7 +9,7 @@ document.getElementById("reason").textContent = "Reason: " + reason;
 
 document.getElementById("proceedBtn").addEventListener("click", () => {
   const confirmAgain = confirm(
-    "This file may harm your system. Do you still want to continue?"
+    "This file may harm your system. Do you want to continue?"
   );
 
   if (confirmAgain) {
