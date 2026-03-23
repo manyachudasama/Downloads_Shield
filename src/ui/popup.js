@@ -1,13 +1,13 @@
-const statusText = document.getElementById("statusText");
+const statusBox = document.getElementById("statusBox");
 const toggleBtn = document.getElementById("toggleBtn");
 
-// Load current setting
+// Load setting
 chrome.storage.sync.get(["settings"], (res) => {
   const enabled = res.settings?.enabled ?? true;
   updateUI(enabled);
 });
 
-// Toggle button click
+// Toggle
 toggleBtn.addEventListener("click", () => {
   chrome.storage.sync.get(["settings"], (res) => {
     const current = res.settings?.enabled ?? true;
@@ -20,11 +20,17 @@ toggleBtn.addEventListener("click", () => {
   });
 });
 
-// Update UI
+// UI update
 function updateUI(enabled) {
-  statusText.innerText = "Protection: " + (enabled ? "ON" : "OFF");
+  statusBox.textContent = enabled
+    ? "Protection is ON"
+    : "Protection is OFF";
 
-  toggleBtn.innerText = enabled ? "Disable" : "Enable";
+  statusBox.className = "status " + (enabled ? "on" : "off");
 
-  toggleBtn.className = enabled ? "enabled" : "disabled";
+  toggleBtn.textContent = enabled
+    ? "Disable Protection"
+    : "Enable Protection";
+
+  toggleBtn.className = enabled ? "disable" : "enable";
 }
