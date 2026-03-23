@@ -1,57 +1,97 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>⚠️ Unsafe Download Blocked</title>
+  <title>SafeShield Warning</title>
   <style>
     body {
-      font-family: Arial;
-      background: #121212;
-      color: white;
-      text-align: center;
-      padding: 50px;
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #020617);
+      color: #e2e8f0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .box {
-      background: #1e1e1e;
+    .card {
+      background: #1e293b;
       padding: 30px;
-      border-radius: 10px;
-      display: inline-block;
-      max-width: 500px;
+      border-radius: 12px;
+      width: 420px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      text-align: center;
     }
 
-    .danger {
-      color: #ff4d4d;
-      font-size: 20px;
-      margin-bottom: 20px;
+    .icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .file {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 15px;
+      word-break: break-all;
+    }
+
+    .reason {
+      color: #f87171;
+      font-size: 14px;
+      margin-bottom: 25px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
     }
 
     button {
-      margin: 10px;
-      padding: 10px 20px;
+      padding: 10px 16px;
+      border-radius: 6px;
       border: none;
-      border-radius: 5px;
+      font-size: 14px;
       cursor: pointer;
+      transition: 0.2s;
     }
 
     .proceed {
-      background: orange;
+      background: #f59e0b;
+      color: white;
     }
 
     .cancel {
-      background: gray;
+      background: #334155;
+      color: white;
+    }
+
+    button:hover {
+      opacity: 0.9;
     }
   </style>
 </head>
 
 <body>
-  <div class="box">
-    <h1>⚠️ Download Blocked</h1>
+  <div class="card">
+    <div class="icon">⚠️</div>
 
-    <p id="fileName"></p>
-    <p class="danger" id="reason"></p>
+    <div class="title">Download Blocked</div>
 
-    <button class="proceed" id="proceedBtn">Proceed Anyway</button>
-    <button class="cancel" id="cancelBtn">Cancel</button>
+    <div class="file" id="fileName"></div>
+
+    <div class="reason" id="reason"></div>
+
+    <div class="buttons">
+      <button class="proceed" id="proceedBtn">Proceed Anyway</button>
+      <button class="cancel" id="cancelBtn">Cancel</button>
+    </div>
   </div>
 
   <script src="warning.js"></script>
