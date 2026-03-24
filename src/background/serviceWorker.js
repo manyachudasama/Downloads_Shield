@@ -1,10 +1,21 @@
 import { analyzeDownload } from "../core/analyzer.js";
 import { getSettings, saveLog } from "../storage/storageManager.js";
 
+const allowedDownloads = new Set();
+
 chrome.downloads.onDeterminingFilename.addListener(async (item, suggest) => {
+  if (allowedDownloads.has(item.id)) {
+    allowedDownloads.delete(item.id);
+    suggest();
+    return;
+  }
+
   try {
     const settings = await getSettings();
-    if (!settings.enabled) return suggest();
+    if (!settings.enabled) {
+      suggest();
+      return;
+    }
 
     const filename = (item.filename || "").toLowerCase();
 
@@ -46,13 +57,17 @@ chrome.downloads.onDeterminingFilename.addListener(async (item, suggest) => {
   }
 });
 
-chrome.runtime.onMessage.addListener((msg) => {
+chrome.runtime.onMessage.addListener(async (msg) => {
   if (msg.type === "ALLOW_DOWNLOAD") {
-    chrome.downloads.download({
-      url: msg.url,
-      filename: msg.filename,
-      conflictAction: "uniquify"
-    });
+    try {
+      const downloadId = await chrome.downloads.download({
+        url: msg.url,
+        conflictAction: "uniquify"
+      });
+      allowedDownloads.add(downloadId);
+    } catch (e) {
+      console.error("Failed to start allowed download", e);
+    }
   }
 });
 
