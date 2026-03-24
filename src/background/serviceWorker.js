@@ -1,12 +1,5 @@
-import { analyzeDownload } from "../core/analyzer.js";
-import { getSettings, saveLog } from "../storage/storageManager.js";
-
-function openWarningPage(item, reason) {
-  const url = chrome.runtime.getURL(
-    `../ui/warning.html?file=${encodeURIComponent(item.filename || "")}&reason=${encodeURIComponent(reason)}&downloadUrl=${encodeURIComponent(item.url)}`
-  );
-  chrome.tabs.create({ url });
-}
+import { analyzeDownload } from "./analyzer.js";
+import { getSettings, saveLog } from "./storageManager.js";
 
 chrome.downloads.onCreated.addListener(async (item) => {
   if (!item.url || item.state === "interrupted") return;
@@ -16,13 +9,14 @@ chrome.downloads.onCreated.addListener(async (item) => {
   const settings = await getSettings();
   if (!settings.enabled) return;
 
-  const filename = (item.filename || "").toLowerCase();
+  const filename = item.filename || item.url.split("/").pop();
 
-  if (filename.endsWith(".zip")) {
+  // Handle ZIP warning
+  if (filename.toLowerCase().endsWith(".zip")) {
     chrome.downloads.cancel(item.id);
 
-    saveLog({
-      filename: item.filename,
+    await saveLog({
+      filename,
       url: item.url,
       action: "warning",
       reason: "ZIP file - requires user confirmation",
@@ -38,8 +32,8 @@ chrome.downloads.onCreated.addListener(async (item) => {
   if (result.isDangerous) {
     chrome.downloads.cancel(item.id);
 
-    saveLog({
-      filename: item.filename,
+    await saveLog({
+      filename,
       url: item.url,
       action: "blocked",
       reason: result.reason,
@@ -49,3 +43,28 @@ chrome.downloads.onCreated.addListener(async (item) => {
     openWarningPage(item, result.reason);
   }
 });
+
+// Listen for ALLOW_DOWNLOAD from warning page
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.type === "ALLOW_DOWNLOAD") {
+    chrome.downloads.download({
+      url: msg.url,
+      filename: msg.filename,
+      conflictAction: "uniquify"
+    });
+  }
+});
+
+// Open warning page function
+function openWarningPage(item, reason) {
+  const warningUrl = chrome.runtime.getURL(
+    `src/ui/warning.html?file=${encodeURIComponent(item.filename)}&reason=${encodeURIComponent(reason)}&downloadUrl=${encodeURIComponent(item.url)}`
+  );
+
+  chrome.windows.create({
+    url: warningUrl,
+    type: "popup",
+    width: 450,
+    height: 300
+  });
+}

@@ -3,7 +3,7 @@ const DEFAULT_SETTINGS = {
   blacklist: []
 };
 
-// Get settings
+// Use local storage consistently
 export async function getSettings() {
   return new Promise((resolve) => {
     chrome.storage.local.get(["settings"], (res) => {
@@ -12,14 +12,12 @@ export async function getSettings() {
   });
 }
 
-// Save settings
 export async function saveSettings(settings) {
   return new Promise((resolve) => {
     chrome.storage.local.set({ settings }, resolve);
   });
 }
 
-// Save logs
 export async function saveLog(log) {
   return new Promise((resolve) => {
     chrome.storage.local.get(["logs"], (res) => {
@@ -30,7 +28,6 @@ export async function saveLog(log) {
   });
 }
 
-// Get logs
 export async function getLogs() {
   return new Promise((resolve) => {
     chrome.storage.local.get(["logs"], (res) => {
