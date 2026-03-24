@@ -1,23 +1,54 @@
-import { isDangerousFile } from "./fileDetector.js";
+import {
+  extractFileName,
+  getExtension,
+  hasDoubleExtension,
+  isDangerousExtension
+} from "./fileDetector.js";
+
+import {
+  getMimeType,
+  isExecutableMime
+} from "./mimeChecker.js";
+
+import {
+  hasSuspiciousKeyword
+} from "./rulesEngine.js";
 
 export async function analyzeDownload(item) {
-  const filename = item.filename || item.url.split("/").pop();
+  const filename = extractFileName(item);
+  const ext = getExtension(filename);
+  const mime = await getMimeType(item.url);
 
-  // Extension check
-  if (isDangerousFile(filename)) {
+  if (hasDoubleExtension(filename)) {
     return {
       isDangerous: true,
-      reason: "Dangerous file type detected"
+      reason: "Disguised file detected"
     };
   }
 
-  // ZIP Files (future upgrade)
-  if (filename.endsWith(".zip")) {
+  if (isDangerousExtension(ext)) {
     return {
-      isDangerous: false,
-      reason: "ZIP scan not implemented yet"
+      isDangerous: true,
+      reason: "Blocked file type: ." + ext
     };
   }
 
-  return { isDangerous: false };
+  if (!ext && isExecutableMime(mime)) {
+    return {
+      isDangerous: true,
+      reason: "Executable file without extension"
+    };
+  }
+
+  if (hasSuspiciousKeyword(filename) || hasSuspiciousKeyword(item.url)) {
+    return {
+      isDangerous: true,
+      reason: "Suspicious keyword detected"
+    };
+  }
+
+  return {
+    isDangerous: false,
+    reason: ""
+  };
 }
