@@ -7,11 +7,11 @@ export async function analyzeDownload(item) {
   if (isDangerousFile(filename)) {
     return {
       isDangerous: true,
-      reason: "Blocked: dangerous file type detected"
+      reason: "Dangerous file type detected"
     };
   }
 
-  // ZIP placeholder (future upgrade)
+  // ZIP Files (future upgrade)
   if (filename.endsWith(".zip")) {
     return {
       isDangerous: false,
