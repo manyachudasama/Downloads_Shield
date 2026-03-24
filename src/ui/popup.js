@@ -1,7 +1,7 @@
 const statusBox = document.getElementById("statusBox");
 const toggleBtn = document.getElementById("toggleBtn");
 
-// Load setting
+// Load settings
 chrome.storage.sync.get(["settings"], (res) => {
   const enabled = res.settings?.enabled ?? true;
   updateUI(enabled);
