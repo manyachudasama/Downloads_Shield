@@ -1,5 +1,5 @@
-import { analyzeDownload } from "./analyzer.js";
-import { getSettings, saveLog } from "./storageManager.js";
+import { analyzeDownload } from "../analyzer.js";
+import { getSettings, saveLog } from "../storageManager.js";
 
 chrome.downloads.onCreated.addListener(async (item) => {
   if (!item.url || item.state === "interrupted") return;
@@ -11,7 +11,7 @@ chrome.downloads.onCreated.addListener(async (item) => {
 
   const filename = item.filename || item.url.split("/").pop();
 
-  // Handle ZIP warning
+  // ZIP warning
   if (filename.toLowerCase().endsWith(".zip")) {
     chrome.downloads.cancel(item.id);
 
@@ -44,7 +44,7 @@ chrome.downloads.onCreated.addListener(async (item) => {
   }
 });
 
-// Listen for ALLOW_DOWNLOAD from warning page
+// Allow download from warning page
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === "ALLOW_DOWNLOAD") {
     chrome.downloads.download({
@@ -55,7 +55,7 @@ chrome.runtime.onMessage.addListener((msg) => {
   }
 });
 
-// Open warning page function
+// Open warning page popup
 function openWarningPage(item, reason) {
   const warningUrl = chrome.runtime.getURL(
     `src/ui/warning.html?file=${encodeURIComponent(item.filename)}&reason=${encodeURIComponent(reason)}&downloadUrl=${encodeURIComponent(item.url)}`

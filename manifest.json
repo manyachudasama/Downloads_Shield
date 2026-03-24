@@ -5,10 +5,10 @@
   "description": "Blocks dangerous and suspicious file downloads with smart detection and user confirmation.",
 
   "permissions": [
-  "downloads",
-  "downloads.open",
-  "storage",
-  "tabs"
+    "downloads",
+    "downloads.open",
+    "storage",
+    "tabs"
   ],
 
   "host_permissions": [
@@ -16,12 +16,12 @@
   ],
 
   "background": {
-  "service_worker": "src/background/serviceWorker.js",
-  "type": "module"
-  }, 
+    "service_worker": "src/background/serviceWorker.js",
+    "type": "module"
+  },
 
   "action": {
-  "default_popup": "src/ui/popup.html",
-  "default_title": "SafeShield"
-   }
+    "default_popup": "src/ui/popup.html",
+    "default_title": "SafeShield"
+  }
 }
