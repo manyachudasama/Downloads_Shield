@@ -1,3 +1,8 @@
+import { analyzeDownload } from "../core/analyzer.js";
+import { getSettings, saveLog } from "../storage/storageManager.js";
+
+let allowNextDownload = false;
+
 chrome.downloads.onCreated.addListener(async (item) => {
   if (!item.url || item.state === "interrupted") return;
 
@@ -5,10 +10,15 @@ chrome.downloads.onCreated.addListener(async (item) => {
 
   if (item.byExtensionId === chrome.runtime.id) return;
 
+  if (allowNextDownload) {
+    allowNextDownload = false;
+    return;
+  }
+
   const settings = await getSettings();
   if (!settings.enabled) return;
 
-  const filename = item.filename.toLowerCase();
+  const filename = (item.filename || "").toLowerCase();
 
   if (filename.endsWith(".zip")) {
     chrome.downloads.cancel(item.id);
@@ -41,3 +51,24 @@ chrome.downloads.onCreated.addListener(async (item) => {
     openWarningPage(item, result.reason);
   }
 });
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "ALLOW_DOWNLOAD") {
+    allowNextDownload = true;
+
+    chrome.downloads.download({
+      url: message.url,
+      filename: message.filename,
+      conflictAction: "uniquify",
+      saveAs: false
+    });
+  }
+});
+
+function openWarningPage(item, reason) {
+  const url = chrome.runtime.getURL(
+    `src/ui/warning.html?file=${encodeURIComponent(item.filename)}&reason=${encodeURIComponent(reason)}&downloadUrl=${encodeURIComponent(item.url)}`
+  );
+
+  chrome.tabs.create({ url });
+}

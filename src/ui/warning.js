@@ -16,7 +16,8 @@ document.getElementById("proceed").addEventListener("click", () => {
 
   chrome.runtime.sendMessage({
     type: "ALLOW_DOWNLOAD",
-    url: downloadUrl
+    url: downloadUrl,
+    filename: file
   });
 
   window.close();
