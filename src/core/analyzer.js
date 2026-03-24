@@ -47,13 +47,6 @@ export async function analyzeDownload(item) {
     };
   }
 
-  if (ext === "zip") {
-    return {
-      isDangerous: false,
-      reason: ""
-    };
-  }
-
   return {
     isDangerous: false,
     reason: ""
