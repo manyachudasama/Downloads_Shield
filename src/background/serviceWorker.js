@@ -1,24 +1,17 @@
 import { analyzeDownload } from "../core/analyzer.js";
 import { getSettings, saveLog } from "../storage/storageManager.js";
+const allowedDownloads = new Set();
 
 chrome.downloads.onCreated.addListener(async (item) => {
   const settings = await getSettings();
+
   if (!settings.enabled) return;
 
-  const filename = item.filename.toLowerCase();
+  const filename = item.filename || item.url.split("/").pop();
+  item.filename = filename;
 
-  if (filename.endsWith(".zip")) {
-    chrome.downloads.cancel(item.id);
-
-    saveLog({
-      filename: item.filename,
-      url: item.url,
-      action: "warning",
-      reason: "ZIP file - requires user confirmation",
-      time: Date.now()
-    });
-
-    openWarningPage(item, "ZIP files may contain harmful content");
+  if (allowedDownloads.has(item.url)) {
+    allowedDownloads.delete(item.url);
     return;
   }
 
@@ -36,6 +29,12 @@ chrome.downloads.onCreated.addListener(async (item) => {
     });
 
     openWarningPage(item, result.reason);
+  }
+});
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "ALLOW_DOWNLOAD") {
+    allowedDownloads.add(message.url);
   }
 });
 

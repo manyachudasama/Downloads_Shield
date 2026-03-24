@@ -1,7 +1,11 @@
+const DEFAULT_SETTINGS = {
+  enabled: true
+};
+
 export async function getSettings() {
   return new Promise((resolve) => {
     chrome.storage.local.get(["settings"], (result) => {
-      resolve(result.settings || { enabled: true });
+      resolve(result.settings || DEFAULT_SETTINGS);
     });
   });
 }
@@ -18,14 +22,6 @@ export async function saveLog(log) {
       const logs = result.logs || [];
       logs.push(log);
       chrome.storage.local.set({ logs }, resolve);
-    });
-  });
-}
-
-export async function getLogs() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(["logs"], (result) => {
-      resolve(result.logs || []);
     });
   });
 }

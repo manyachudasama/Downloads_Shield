@@ -1,26 +1,31 @@
 const params = new URLSearchParams(window.location.search);
 
-const file = params.get("file");
+const fileName = params.get("file");
 const reason = params.get("reason");
 const downloadUrl = params.get("downloadUrl");
 
-document.getElementById("file").textContent = file;
-document.getElementById("reason").textContent = reason;
+document.getElementById("fileName").textContent = "File: " + fileName;
+document.getElementById("reason").textContent = "Reason: " + reason;
 
-document.getElementById("proceed").addEventListener("click", () => {
-  const firstConfirm = confirm("This file may harm your system. Continue?");
-  if (!firstConfirm) return;
+document.getElementById("proceedBtn").addEventListener("click", () => {
+  const confirmAgain = confirm(
+    "This file may harm your system. Do you want to continue?"
+  );
 
-  const secondConfirm = confirm("Are you absolutely sure you want to download?");
-  if (!secondConfirm) return;
+  if (confirmAgain) {
+    chrome.runtime.sendMessage({
+      type: "ALLOW_DOWNLOAD",
+      url: downloadUrl
+    });
 
-  chrome.downloads.download({
-    url: downloadUrl
-  });
+    chrome.downloads.download({
+      url: downloadUrl
+    });
 
-  window.close();
+    window.close();
+  }
 });
 
-document.getElementById("cancel").addEventListener("click", () => {
+document.getElementById("cancelBtn").addEventListener("click", () => {
   window.close();
 });

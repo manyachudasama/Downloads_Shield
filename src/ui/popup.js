@@ -1,36 +1,14 @@
-const statusBox = document.getElementById("statusBox");
-const toggleBtn = document.getElementById("toggleBtn");
+import { getSettings, saveSettings } from "../storage/storageManager.js";
 
-// Load setting
-chrome.storage.sync.get(["settings"], (res) => {
-  const enabled = res.settings?.enabled ?? true;
-  updateUI(enabled);
-});
+const toggle = document.getElementById("toggle");
 
-// Toggle
-toggleBtn.addEventListener("click", () => {
-  chrome.storage.sync.get(["settings"], (res) => {
-    const current = res.settings?.enabled ?? true;
+(async () => {
+  const settings = await getSettings();
+  toggle.checked = settings.enabled;
+})();
 
-    const updated = { enabled: !current };
-
-    chrome.storage.sync.set({ settings: updated }, () => {
-      updateUI(updated.enabled);
-    });
+toggle.addEventListener("change", async () => {
+  await saveSettings({
+    enabled: toggle.checked
   });
 });
-
-// UI update
-function updateUI(enabled) {
-  statusBox.textContent = enabled
-    ? "Protection is ON"
-    : "Protection is OFF";
-
-  statusBox.className = "status " + (enabled ? "on" : "off");
-
-  toggleBtn.textContent = enabled
-    ? "Disable Protection"
-    : "Enable Protection";
-
-  toggleBtn.className = enabled ? "disable" : "enable";
-}
