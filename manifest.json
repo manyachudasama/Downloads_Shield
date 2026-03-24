@@ -5,9 +5,10 @@
   "description": "Blocks dangerous and suspicious file downloads with smart detection and user confirmation.",
 
   "permissions": [
-    "downloads",
-    "storage",
-    "tabs"
+  "downloads",
+  "downloads.open",
+  "storage",
+  "tabs"
   ],
 
   "host_permissions": [
