@@ -1,30 +1,25 @@
 import { analyzeDownload } from "../core/analyzer.js";
 import { getSettings, saveLog } from "../storage/storageManager.js";
 
-chrome.downloads.onCreated.addListener(async (item) => {
+chrome.downloads.onDeterminingFilename.addListener(async (item, suggest) => {
   try {
-    if (!item.url || item.state === "interrupted") return;
-    if (!item.url.startsWith("http")) return;
-    if (item.byExtensionId === chrome.runtime.id) return;
-
     const settings = await getSettings();
-    if (!settings.enabled) return;
+    if (!settings.enabled) return suggest();
 
-    const filename = item.filename || item.url.split("/").pop();
+    const filename = (item.filename || "").toLowerCase();
 
-    // ZIP warning
-    if (filename.toLowerCase().endsWith(".zip")) {
+    if (filename.endsWith(".zip") || filename.endsWith(".exe")) {
       chrome.downloads.cancel(item.id);
 
       await saveLog({
         filename,
         url: item.url,
-        action: "warning",
-        reason: "ZIP file",
+        action: "blocked",
+        reason: "Blocked file",
         time: Date.now()
       });
 
-      openWarningPage(item, "ZIP files may contain harmful content");
+      openWarningPage(item, "File may be unsafe");
       return;
     }
 
@@ -42,13 +37,15 @@ chrome.downloads.onCreated.addListener(async (item) => {
       });
 
       openWarningPage(item, result.reason);
+      return;
     }
-  } catch (err) {
-    console.error("Error in download handler:", err);
+
+    suggest();
+  } catch {
+    suggest();
   }
 });
 
-// allow download
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === "ALLOW_DOWNLOAD") {
     chrome.downloads.download({
@@ -59,7 +56,6 @@ chrome.runtime.onMessage.addListener((msg) => {
   }
 });
 
-// open warning UI
 function openWarningPage(item, reason) {
   const url = chrome.runtime.getURL(
     `src/ui/warning.html?file=${encodeURIComponent(item.filename)}&reason=${encodeURIComponent(reason)}&downloadUrl=${encodeURIComponent(item.url)}`
@@ -69,6 +65,6 @@ function openWarningPage(item, reason) {
     url,
     type: "popup",
     width: 450,
-    height: 300
+    height: 320
   });
 }
