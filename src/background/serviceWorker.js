@@ -1,14 +1,22 @@
+import { analyzeDownload } from "../core/analyzer.js";
+import { getSettings, saveLog } from "../storage/storageManager.js";
+
+function openWarningPage(item, reason) {
+  const url = chrome.runtime.getURL(
+    `../ui/warning.html?file=${encodeURIComponent(item.filename || "")}&reason=${encodeURIComponent(reason)}&downloadUrl=${encodeURIComponent(item.url)}`
+  );
+  chrome.tabs.create({ url });
+}
+
 chrome.downloads.onCreated.addListener(async (item) => {
   if (!item.url || item.state === "interrupted") return;
-
   if (!item.url.startsWith("http")) return;
-
   if (item.byExtensionId === chrome.runtime.id) return;
 
   const settings = await getSettings();
   if (!settings.enabled) return;
 
-  const filename = item.filename.toLowerCase();
+  const filename = (item.filename || "").toLowerCase();
 
   if (filename.endsWith(".zip")) {
     chrome.downloads.cancel(item.id);
