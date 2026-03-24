@@ -8,14 +8,20 @@ export function isDangerousFile(filename) {
 
   filename = filename.toLowerCase();
 
-  const parts = filename.split(".");
-  if (parts.length < 2) return false;
+  // Remove query params if present
+  filename = filename.split("?")[0];
 
-  const extension = parts.pop();
-  const previous = parts.pop();
+  // Check extension anywhere in filename
+  for (let ext of dangerousExtensions) {
+    if (filename.endsWith("." + ext)) {
+      return true;
+    }
 
-  if (dangerousExtensions.includes(extension)) return true;
-  if (previous && dangerousExtensions.includes(previous)) return true;
+    // Detect disguised files like file.pdf.exe
+    if (filename.includes("." + ext)) {
+      return true;
+    }
+  }
 
   return false;
 }
