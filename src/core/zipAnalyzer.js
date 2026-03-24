@@ -1,4 +1,4 @@
 // // Future: inspect zip contents
-export function analyzeZip() {
-  return { safe: true };
-}
+// export function analyzeZip() {
+//   return { safe: true };
+// }
