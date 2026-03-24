@@ -1,7 +1,6 @@
 const dangerousExtensions = [
-  "exe", "scr", "vbs", "bat", "com",
-  "pif", "js", "msi", "html", "cmd",
-  "sh", "jar"
+  "exe","scr","vbs","bat","com","pif",
+  "js","msi","html","cmd","sh","jar"
 ];
 
 export function isDangerousFile(filename) {
@@ -9,22 +8,14 @@ export function isDangerousFile(filename) {
 
   filename = filename.toLowerCase();
 
-  // Extract extension
   const parts = filename.split(".");
   if (parts.length < 2) return false;
 
   const extension = parts.pop();
+  const previous = parts.pop();
 
-  // Check double extensions (file.pdf.exe)
-  const secondExtension = parts.pop();
-
-  if (dangerousExtensions.includes(extension)) {
-    return true;
-  }
-
-  if (secondExtension && dangerousExtensions.includes(secondExtension)) {
-    return true;
-  }
+  if (dangerousExtensions.includes(extension)) return true;
+  if (previous && dangerousExtensions.includes(previous)) return true;
 
   return false;
 }

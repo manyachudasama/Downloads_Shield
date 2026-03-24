@@ -3,14 +3,15 @@ import { isDangerousFile } from "./fileDetector.js";
 export async function analyzeDownload(item) {
   const filename = item.filename || item.url.split("/").pop();
 
+  // Extension check
   if (isDangerousFile(filename)) {
     return {
       isDangerous: true,
-      reason: "Blocked due to dangerous file type"
+      reason: "Blocked: dangerous file type detected"
     };
   }
 
-  // Future: ZIP scanning logic
+  // ZIP placeholder (future upgrade)
   if (filename.endsWith(".zip")) {
     return {
       isDangerous: false,
@@ -18,7 +19,5 @@ export async function analyzeDownload(item) {
     };
   }
 
-  return {
-    isDangerous: false
-  };
+  return { isDangerous: false };
 }
