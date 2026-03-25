@@ -3,13 +3,11 @@ const DEFAULT_SETTINGS = {
   blacklist: []
 };
 
+// Use local storage consistently
 export async function getSettings() {
   return new Promise((resolve) => {
     chrome.storage.local.get(["settings"], (res) => {
-      resolve({
-        ...DEFAULT_SETTINGS,
-        ...(res.settings || {})
-      });
+      resolve(res.settings || DEFAULT_SETTINGS);
     });
   });
 }

@@ -9,15 +9,12 @@ chrome.storage.sync.get(["settings"], (res) => {
 
 // Toggle
 toggleBtn.addEventListener("click", () => {
-  chrome.storage.local.get(["settings"], (res) => {
+  chrome.storage.sync.get(["settings"], (res) => {
     const current = res.settings?.enabled ?? true;
 
-    const updated = {
-      ...res.settings,
-      enabled: !current
-    };
+    const updated = { enabled: !current };
 
-    chrome.storage.local.set({ settings: updated }, () => {
+    chrome.storage.sync.set({ settings: updated }, () => {
       updateUI(updated.enabled);
     });
   });
