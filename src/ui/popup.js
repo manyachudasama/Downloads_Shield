@@ -2,19 +2,19 @@ const statusBox = document.getElementById("statusBox");
 const toggleBtn = document.getElementById("toggleBtn");
 
 // Load settings
-chrome.storage.sync.get(["settings"], (res) => {
+chrome.storage.local.get(["settings"], (res) => {
   const enabled = res.settings?.enabled ?? true;
   updateUI(enabled);
 });
 
 // Toggle
 toggleBtn.addEventListener("click", () => {
-  chrome.storage.sync.get(["settings"], (res) => {
+  chrome.storage.local.get(["settings"], (res) => {
     const current = res.settings?.enabled ?? true;
 
     const updated = { enabled: !current };
 
-    chrome.storage.sync.set({ settings: updated }, () => {
+    chrome.storage.local.set({ settings: updated }, () => {
       updateUI(updated.enabled);
     });
   });
