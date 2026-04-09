@@ -34,3 +34,9 @@ function updateUI(enabled) {
 
   toggleBtn.className = enabled ? "disable" : "enable";
 }
+
+document.getElementById("adminBtn").addEventListener("click", () => {
+  chrome.tabs.create({
+    url: chrome.runtime.getURL("src/ui/admin.html")
+  });
+});
