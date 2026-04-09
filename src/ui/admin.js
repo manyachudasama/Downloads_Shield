@@ -18,7 +18,7 @@ document.getElementById("loginBtn").addEventListener("click", () => {
   }
 });
 
-// Load logs (USES YOUR EXISTING STORAGE ✅)
+// Load logs
 function loadLogs() {
   chrome.storage.local.get(["logs"], (res) => {
     const logs = res.logs || [];
